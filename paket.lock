@@ -1,12 +1,12 @@
-RESTRICTION: == net9.0
+RESTRICTION: == net10.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Expecto (10.2.3)
       FSharp.Core (>= 7.0.200)
       Mono.Cecil (>= 0.11.4 < 1.0)
-    Feather.ErrorHandling (1.0)
-      FSharp.Core (>= 9.0.201 < 10.0)
-    FSharp.Core (9.0.303)
+    Feather.ErrorHandling (2.0)
+      FSharp.Core (>= 10.0.100 < 11.0)
+    FSharp.Core (10.0.102)
     Microsoft.ApplicationInsights (2.23)
       System.Diagnostics.DiagnosticSource (>= 5.0)
     Microsoft.Testing.Extensions.Telemetry (2.0.2)
@@ -27,10 +27,8 @@ NUGET
     Microsoft.TestPlatform.ObjectModel (18.0.1)
       System.Reflection.Metadata (>= 8.0)
     Mono.Cecil (0.11.6)
-    System.Collections.Immutable (10.0.2)
     System.Diagnostics.DiagnosticSource (10.0.2)
     System.Reflection.Metadata (10.0.2)
-      System.Collections.Immutable (>= 10.0.2)
     YoloDev.Expecto.TestSdk (0.15.5)
       Expecto (>= 10.2.2 < 11.0)
       FSharp.Core (>= 7.0.200)
