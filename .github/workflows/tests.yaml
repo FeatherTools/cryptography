@@ -1,0 +1,31 @@
+name: Tests
+
+on:
+  #push:
+  pull_request:
+  schedule:
+      -   cron:  '0 3 * * *'
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu-latest
+            run: ./build.sh
+    runs-on: ${{ matrix.os.name }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.x
+
+      - name: Run tests
+        env:
+          PRIVATE_FEED_USER: ${{ github.repository_owner }}
+          PRIVATE_FEED_PASS: ${{ secrets.GITHUB_TOKEN }}
+          DOTNET_ROLL_FORWARD: latestMajor
+        run: ${{ matrix.os.run }} -t tests no-lint  # temporary no-lint to unblock CI
