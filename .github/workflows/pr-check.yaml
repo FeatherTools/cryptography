@@ -1,0 +1,24 @@
+name: Pull request check
+
+on: [pull_request]
+
+jobs:
+  block-fixup-merge:
+    runs-on: ubuntu-latest
+    name: Block fixup commits
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Block fixup commit merge
+        uses: 13rac1/block-fixup-merge-action@v2.0.0
+
+  shellcheck: # https://github.com/marketplace/actions/shellcheck
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+        -   uses: actions/checkout@v6
+        -   name: Run ShellCheck
+            uses: ludeeus/action-shellcheck@master
+            env:
+                SHELLCHECK_OPTS: -e SC1090

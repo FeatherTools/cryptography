@@ -1,0 +1,22 @@
+framework: net9.0
+
+source https://api.nuget.org/v3/index.json
+nuget FSharp.Core ~> 9.0
+
+nuget Feather.ErrorHandling ~> 1.0
+
+nuget Expecto
+nuget YoloDev.Expecto.TestSdk
+
+// [ FAKE GROUP ]
+group Build
+    storage none
+    source https://api.nuget.org/v3/index.json
+    nuget Fake.DotNet.Cli
+    nuget Fake.IO.FileSystem
+    nuget Fake.IO.Zip
+    nuget Fake.Core.Target
+    nuget Fake.Core.UserInput
+    nuget Fake.DotNet.AssemblyInfoFile
+    nuget Fake.Core.ReleaseNotes
+    nuget Fake.Tools.Git
