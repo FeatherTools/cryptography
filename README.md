@@ -1,4 +1,4 @@
-# <img src="https://github.com/FeatherTools/.github/blob/main/profile/feather-logo-200.png" alt="FeatherTools Logo" width="100" height="100"> cryptography
+# <img src="https://github.com/FeatherTools/.github/blob/main/profile/feather-logo-200.png" alt="FeatherTools Logo" width="100" height="100"> Cryptography
 
 [![NuGet](https://img.shields.io/nuget/v/Feather.Cryptography.svg)](https://www.nuget.org/packages/Feather.Cryptography)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Feather.Cryptography.svg)](https://www.nuget.org/packages/Feather.Cryptography)
