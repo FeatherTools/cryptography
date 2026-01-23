@@ -2,6 +2,7 @@ framework: net10.0
 
 source https://api.nuget.org/v3/index.json
 nuget FSharp.Core ~> 10.0
+nuget BCrypt.Net-Core ~> 1.6
 
 nuget Feather.ErrorHandling ~> 2.0
 
