@@ -143,3 +143,13 @@ module Cryptography =
             | :? CryptographicException ->
                 return! Error "Envelope authentication failed"
         }
+
+    [<RequireQualifiedAccess>]
+    module Bcrypt =
+        open BCrypt.Net
+
+        let hashPassword (password: string): string =
+            BCrypt.HashPassword(password)
+
+        let verifyPassword (password: string) (hashed: string): bool =
+            BCrypt.Verify(password, hashed)

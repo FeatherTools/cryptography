@@ -171,4 +171,16 @@ let cryptographyTests =
                 Expect.equal version 1 "Version should be 1"
                 Expect.equal algorithm "AES-256-GCM" "Algorithm should be AES-256-GCM"
         ]
+
+        testList "Bcrypt" [
+            testCase "should hash and verify password" <| fun _ ->
+                let password = "StrongPassword123!"
+                let hashed = Bcrypt.hashPassword password
+
+                let isValid = Bcrypt.verifyPassword password hashed
+                let isInvalid = Bcrypt.verifyPassword "WrongPassword" hashed
+
+                Expect.isTrue isValid "Password should be valid"
+                Expect.isFalse isInvalid "Wrong password should be invalid"
+        ]
     ]
