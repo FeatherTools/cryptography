@@ -97,6 +97,30 @@ let iv2, ciphertext2, tag2 = AES256GCM.encrypt dek (Some metadata) plaintext
 let decrypted2 = AES256GCM.decrypt dek iv2 ciphertext2 tag2 (Some metadata)
 ```
 
+### Symmetric Encryption
+
+Simple encrypt/decrypt with a single secret string. Works with secrets from AWS Secrets Manager, CDK, or generated locally.
+
+```fsharp
+open Feather.Cryptography.Cryptography
+
+// Generate a strong random secret
+let secret = Symmetric.generateSecret()
+// e.g. "dGhpcyBpcyBhIDMyLWJ5dGUga2V5ISEhISEhISEhIS0"
+
+// Or use a secret stored externally (AWS Secrets Manager, CDK, etc.)
+let secret = "my-secret-from-aws-secrets-manager"
+
+// Encrypt
+let ciphertext = Symmetric.encrypt secret "Hello, symmetric world!"
+// Returns a base64url string: nonce ++ ciphertext ++ auth tag
+
+// Decrypt
+match Symmetric.decrypt secret ciphertext with
+| Ok plaintext -> printfn "Decrypted: %s" plaintext
+| Error msg    -> printfn "Failed: %s" msg
+```
+
 ### Envelope Encryption
 
 Envelope encryption combines symmetric and asymmetric encryption: data is encrypted with a DEK (fast AES-GCM), then the DEK is encrypted with a master key (KEK) (RSA or vault service).
