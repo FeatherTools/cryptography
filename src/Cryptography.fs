@@ -145,6 +145,69 @@ module Cryptography =
         }
 
     [<RequireQualifiedAccess>]
+    module Symmetric =
+        let private keySize = 32  // 256 bits
+        let private nonceSize = 12 // 96 bits
+        let private tagSize = 16  // 128 bits
+
+        /// Generate a random secret suitable for use with encrypt/decrypt.
+        /// Returns a base64url-encoded 32-byte key.
+        let generateSecret () : string =
+            let key = Array.zeroCreate keySize
+            RandomNumberGenerator.Fill(Span<byte>(key))
+            let result = key |> Encode.Base64.encode |> Encode.Base64.toBase64Url
+            Array.Clear(key, 0, key.Length)
+            result
+
+        /// Derive a 32-byte AES key from an arbitrary secret string using HKDF-SHA256.
+        /// This means any string — including secrets from AWS Secrets Manager or CDK — works.
+        let private deriveKey (secret: string) : byte[] =
+            let ikm = Encode.stringToBytes secret
+            HKDF.DeriveKey(HashAlgorithmName.SHA256, ikm, keySize, [||], [||])
+
+        /// Encrypt plaintext string with the given secret using AES-256-GCM.
+        /// Returns a base64url-encoded string (nonce ++ ciphertext ++ tag).
+        let encrypt (secret: string) (plaintext: string) : string =
+            let key = deriveKey secret
+            try
+                let nonce = Array.zeroCreate nonceSize
+                RandomNumberGenerator.Fill(Span<byte>(nonce))
+                let plaintextBytes = Encode.stringToBytes plaintext
+                let ciphertext = Array.zeroCreate plaintextBytes.Length
+                let tag = Array.zeroCreate tagSize
+                use aesGcm = new AesGcm(key, tagSize)
+                aesGcm.Encrypt(nonce, plaintextBytes, ciphertext, tag)
+                Array.concat [ nonce; ciphertext; tag ]
+                |> Encode.Base64.encode
+                |> Encode.Base64.toBase64Url
+            finally
+                Array.Clear(key, 0, key.Length)
+
+        /// Decrypt a base64url-encoded ciphertext (produced by encrypt) with the given secret.
+        let decrypt (secret: string) (encoded: string) : Result<string, string> =
+            try
+                let bytes = encoded |> Encode.Base64.fromBase64Url |> Encode.Base64.decode
+                if bytes.Length < nonceSize + tagSize then
+                    Error "Invalid ciphertext: too short"
+                else
+                    let nonce = bytes[0 .. nonceSize - 1]
+                    let ciphertextLen = bytes.Length - nonceSize - tagSize
+                    let ciphertext = bytes[nonceSize .. nonceSize + ciphertextLen - 1]
+                    let tag = bytes[nonceSize + ciphertextLen ..]
+                    let key = deriveKey secret
+                    let plaintext = Array.zeroCreate ciphertextLen
+                    try
+                        use aesGcm = new AesGcm(key, tagSize)
+                        aesGcm.Decrypt(nonce, ciphertext, tag, plaintext)
+                        Ok (Encode.bytesToString plaintext)
+                    finally
+                        Array.Clear(key, 0, key.Length)
+                        Array.Clear(plaintext, 0, plaintext.Length)
+            with
+            | :? CryptographicException -> Error "Decryption failed: wrong secret or corrupted data"
+            | :? FormatException -> Error "Decryption failed: invalid encoded format"
+
+    [<RequireQualifiedAccess>]
     module Bcrypt =
         open BCrypt.Net
 

@@ -183,4 +183,69 @@ let cryptographyTests =
                 Expect.isTrue isValid "Password should be valid"
                 Expect.isFalse isInvalid "Wrong password should be invalid"
         ]
+
+        testList "Symmetric" [
+            testCase "should generate a secret" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                Expect.isGreaterThan secret.Length 0 "Secret should not be empty"
+
+            testCase "generated secrets should be unique" <| fun _ ->
+                let s1 = Symmetric.generateSecret()
+                let s2 = Symmetric.generateSecret()
+                Expect.notEqual s1 s2 "Each generated secret should be unique"
+
+            testCase "should encrypt and decrypt with generated secret" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                let plaintext = "Hello, symmetric world!"
+
+                let encrypted = Symmetric.encrypt secret plaintext
+                let decrypted = Symmetric.decrypt secret encrypted |> okOrFail
+
+                Expect.equal decrypted plaintext "Decrypted text should match original"
+
+            testCase "should encrypt and decrypt with arbitrary secret string" <| fun _ ->
+                let secret = "some-aws-generated-secret-value-abc123"
+                let plaintext = "Sensitive payload"
+
+                let encrypted = Symmetric.encrypt secret plaintext
+                let decrypted = Symmetric.decrypt secret encrypted |> okOrFail
+
+                Expect.equal decrypted plaintext "Decrypted text should match original"
+
+            testCase "encrypted output should differ from plaintext" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                let plaintext = "Secret message"
+
+                let encrypted = Symmetric.encrypt secret plaintext
+
+                Expect.notEqual encrypted plaintext "Encrypted output should differ from plaintext"
+
+            testCase "same plaintext should produce different ciphertexts (random nonce)" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                let plaintext = "Same message"
+
+                let e1 = Symmetric.encrypt secret plaintext
+                let e2 = Symmetric.encrypt secret plaintext
+
+                Expect.notEqual e1 e2 "Each encryption should produce a unique ciphertext"
+
+            testCase "decryption with wrong secret should fail" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                let wrongSecret = Symmetric.generateSecret()
+                let plaintext = "Sensitive data"
+
+                let encrypted = Symmetric.encrypt secret plaintext
+                let result = Symmetric.decrypt wrongSecret encrypted
+
+                Expect.isError result "Decryption with wrong secret should fail"
+
+            testCase "decryption of tampered ciphertext should fail" <| fun _ ->
+                let secret = Symmetric.generateSecret()
+                let encrypted = Symmetric.encrypt secret "data"
+                let tampered = encrypted[0 .. encrypted.Length - 3] + "XX"
+
+                let result = Symmetric.decrypt secret tampered
+
+                Expect.isError result "Decryption of tampered data should fail"
+        ]
     ]
