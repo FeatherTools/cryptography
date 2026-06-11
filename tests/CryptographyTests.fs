@@ -172,6 +172,76 @@ let cryptographyTests =
                 Expect.equal algorithm "AES-256-GCM" "Algorithm should be AES-256-GCM"
         ]
 
+        testList "EncryptedEnvelope Batch" [
+            testCase "should encrypt and decrypt multiple items" <| fun _ ->
+                let privateKey, publicKey = RSA256.createKeyPair()
+                let plaintexts = [ "Data 1"B; "Data 2"B; "Data 3"B ]
+
+                let encryptDEK (DEK dek) = asyncResult {
+                    return RSA256.encrypt publicKey dek
+                }
+
+                let decryptDEK (encryptedDek) = asyncResult {
+                    let dekBytes = RSA256.decrypt privateKey encryptedDek
+                    return DEK dekBytes
+                }
+
+                let envelopes =
+                    plaintexts
+                    |> List.map (fun pt -> EncryptedEnvelope.encrypt encryptDEK None pt |> runOkOrFail)
+
+                let decrypted =
+                    envelopes
+                    |> List.map (fun env -> env |> EncryptedEnvelope.decrypt decryptDEK None |> runOkOrFail)
+
+                Expect.equal decrypted plaintexts "Decrypted data should match original list"
+
+            testCase "should encrypt and decrypt multiple items with AAD" <| fun _ ->
+                let privateKey, publicKey = RSA256.createKeyPair()
+                let plaintexts = [ "Data 1"B; "Data 2"B; "Data 3"B ]
+                let aad = AAD "batch-id-456"B |> Some
+
+                let encryptDEK (DEK dek) = asyncResult {
+                    return RSA256.encrypt publicKey dek
+                }
+
+                let decryptDEK (encryptedDek) = asyncResult {
+                    let dekBytes = RSA256.decrypt privateKey encryptedDek
+                    return DEK dekBytes
+                }
+
+                let envelopes =
+                    plaintexts
+                    |> List.map (fun pt -> EncryptedEnvelope.encrypt encryptDEK aad pt |> runOkOrFail)
+
+                let decrypted =
+                    envelopes
+                    |> List.map (fun env -> env |> EncryptedEnvelope.decrypt decryptDEK aad |> runOkOrFail)
+
+                Expect.equal decrypted plaintexts "Decrypted data should match original list"
+
+            testCase "should set version and algorithm for batch items" <| fun _ ->
+                let _, publicKey = RSA256.createKeyPair()
+                let plaintexts = [ "Data 1"B; "Data 2"B; "Data 3"B ]
+
+                let encryptDEK (DEK dek) = asyncResult {
+                    return RSA256.encrypt publicKey dek
+                }
+
+                let envelopes =
+                    plaintexts
+                    |> List.map (fun pt -> EncryptedEnvelope.encrypt encryptDEK None pt |> runOkOrFail)
+
+                envelopes
+                |> List.iter (fun env ->
+                    let (Version version) = env.Version
+                    let (Algorithm algorithm) = env.Algorithm
+
+                    Expect.equal version 1 "Version should be 1"
+                    Expect.equal algorithm "AES-256-GCM" "Algorithm should be AES-256-GCM"
+                )
+        ]
+
         testList "Bcrypt" [
             testCase "should hash and verify password" <| fun _ ->
                 let password = "StrongPassword123!"
@@ -247,5 +317,20 @@ let cryptographyTests =
                 let result = Symmetric.decrypt secret tampered
 
                 Expect.isError result "Decryption of tampered data should fail"
+        ]
+
+        testList "Secret" [
+            testCase "should generate a secret of specified length" <| fun _ ->
+                let length = 32
+                let secret = Secret.generateBytes length
+
+                Expect.isGreaterThan secret.Length 0 "Secret should not be empty"
+                Expect.equal secret.Length 32 "Secret should have expected length"
+
+            testCase "generated secrets should be unique" <| fun _ ->
+                let s1 = Secret.generateBase64Url 20
+                let s2 = Secret.generateBase64Url 20
+
+                Expect.notEqual s1 s2 "Each generated secret should be unique"
         ]
     ]

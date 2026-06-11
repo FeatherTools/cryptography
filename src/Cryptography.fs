@@ -33,6 +33,20 @@ module Cryptography =
     type Algorithm = Algorithm of string
 
     [<RequireQualifiedAccess>]
+    module Secret =
+        let generateBase64Url (length: int): string =
+            let bytes = Array.zeroCreate length
+            RandomNumberGenerator.Fill(Span<byte>(bytes))
+            let result = bytes |> Encode.Base64.encode |> Encode.Base64.toBase64Url
+            Array.Clear(bytes, 0, bytes.Length)
+            result
+
+        let generateBytes length =
+            generateBase64Url length
+            |> Encode.Base64.fromBase64Url
+            |> Encode.Base64.decode
+
+    [<RequireQualifiedAccess>]
     module RSA256 =
         let createKeyPair () =
             use rsa = RSA.Create(2048)
@@ -124,6 +138,35 @@ module Cryptography =
             }
         }
 
+        let encryptBatch (encryptDEKs: DEK list -> AsyncResult<EncryptedData list, string>) (aad: AAD option) (data: byte[] list): AsyncResult<EncryptedEnvelope list, string> = asyncResult {
+            // Generate a random DEK for each piece of data
+            let deks = List.init data.Length (fun _ -> AES256GCM.generateKey())
+
+            // Encrypt each piece of data with its corresponding DEK
+            let encryptedDataList = List.map2 (fun dek data -> AES256GCM.encrypt dek aad data) deks data
+
+            // Encrypt all DEKs in a batch
+            let! encryptedDEKs = encryptDEKs deks
+
+            // Clear all DEKs from memory
+            deks |> List.iter (fun (DEK dekBytes) -> Array.Clear(dekBytes, 0, dekBytes.Length))
+
+            // Combine the encrypted data and DEKs into envelopes
+            let envelopes =
+                List.map2 (fun (IV iv, ciphertext, Tag tag) (EncryptedData encryptedDEK) ->
+                    {
+                        Version = Version 1
+                        Algorithm = Algorithm "AES-256-GCM"
+                        Iv = IV iv
+                        Ciphertext = EncryptedData ciphertext
+                        Tag = Tag tag
+                        DEK = EncryptedData encryptedDEK
+                    }
+                ) encryptedDataList encryptedDEKs
+
+            return envelopes
+        }
+
         /// Decrypt envelope-encrypted data: decrypts the DEK with private key,
         /// then uses the DEK to decrypt the actual data
         let decrypt (decryptDEK: EncryptedData -> AsyncResult<DEK, string>) (aad: AAD option) (envelope: EncryptedEnvelope): AsyncResult<byte[], string> = asyncResult {
@@ -139,6 +182,27 @@ module Cryptography =
                 Array.Clear(dekBytes, 0, dekBytes.Length)
 
                 return plaintext
+            with
+            | :? CryptographicException ->
+                return! Error "Envelope authentication failed"
+        }
+
+        let decryptBatch (decryptDEKs: EncryptedData list -> AsyncResult<DEK list, string>) (aad: AAD option) (envelopes: EncryptedEnvelope list): AsyncResult<byte[] list, string> = asyncResult {
+            try
+                // Decrypt all DEKs in a batch
+                let! deks = envelopes |> List.map _.DEK |> decryptDEKs
+
+                // Decrypt each piece of data with its corresponding DEK
+                let plaintexts =
+                    List.map2 (fun dek envelope ->
+                        let (EncryptedData ciphertext) = envelope.Ciphertext
+                        AES256GCM.decrypt dek envelope.Iv ciphertext envelope.Tag aad
+                    ) deks envelopes
+
+                // Clear all DEKs from memory
+                deks |> List.iter (fun (DEK dekBytes) -> Array.Clear(dekBytes, 0, dekBytes.Length))
+
+                return plaintexts
             with
             | :? CryptographicException ->
                 return! Error "Envelope authentication failed"
