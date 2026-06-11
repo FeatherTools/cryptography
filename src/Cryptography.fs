@@ -216,12 +216,7 @@ module Cryptography =
 
         /// Generate a random secret suitable for use with encrypt/decrypt.
         /// Returns a base64url-encoded 32-byte key.
-        let generateSecret () : string =
-            let key = Array.zeroCreate keySize
-            RandomNumberGenerator.Fill(Span<byte>(key))
-            let result = key |> Encode.Base64.encode |> Encode.Base64.toBase64Url
-            Array.Clear(key, 0, key.Length)
-            result
+        let generateSecret () : string = Secret.generateBase64Url 32
 
         /// Derive a 32-byte AES key from an arbitrary secret string using HKDF-SHA256.
         /// This means any string — including secrets from AWS Secrets Manager or CDK — works.
