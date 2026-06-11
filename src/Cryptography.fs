@@ -33,6 +33,20 @@ module Cryptography =
     type Algorithm = Algorithm of string
 
     [<RequireQualifiedAccess>]
+    module Secret =
+        let generateBase64Url (length: int): string =
+            let bytes = Array.zeroCreate length
+            RandomNumberGenerator.Fill(Span<byte>(bytes))
+            let result = bytes |> Encode.Base64.encode |> Encode.Base64.toBase64Url
+            Array.Clear(bytes, 0, bytes.Length)
+            result
+
+        let generateBytes length =
+            generateBase64Url length
+            |> Encode.Base64.fromBase64Url
+            |> Encode.Base64.decode
+
+    [<RequireQualifiedAccess>]
     module RSA256 =
         let createKeyPair () =
             use rsa = RSA.Create(2048)

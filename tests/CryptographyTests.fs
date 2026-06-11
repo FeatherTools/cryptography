@@ -318,4 +318,19 @@ let cryptographyTests =
 
                 Expect.isError result "Decryption of tampered data should fail"
         ]
+
+        testList "Secret" [
+            testCase "should generate a secret of specified length" <| fun _ ->
+                let length = 32
+                let secret = Secret.generateBytes length
+
+                Expect.isGreaterThan secret.Length 0 "Secret should not be empty"
+                Expect.equal secret.Length 32 "Secret should have expected length"
+
+            testCase "generated secrets should be unique" <| fun _ ->
+                let s1 = Secret.generateBase64Url 20
+                let s2 = Secret.generateBase64Url 20
+
+                Expect.notEqual s1 s2 "Each generated secret should be unique"
+        ]
     ]

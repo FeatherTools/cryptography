@@ -5,6 +5,7 @@
 - Add functions
     - `Cryptography.EncryptedEnvelope.encryptBatch`
     - `Cryptography.EncryptedEnvelope.decryptBatch`
+- Add `Cryptography.Secret` module
 
 ## 2.2.0 - 2026-06-09
 - Add `Cryptography.Symmetric` module with `generateSecret`, `encrypt`, and `decrypt`
