@@ -24,3 +24,6 @@ paket-files/
 
 # Released
 release/*.nupkg
+
+# APM dependencies
+apm_modules/

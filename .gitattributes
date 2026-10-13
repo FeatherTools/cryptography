@@ -1,0 +1,13 @@
+# Copilot APM outputs
+**/.agents/skills/**        linguist-generated
+**/.github/agents/**        linguist-generated
+**/.github/hooks/**         linguist-generated
+**/.github/instructions/**  linguist-generated
+
+# Claude APM outputs
+**/.claude/agents/**        linguist-generated
+**/.claude/apm-hooks.json   linguist-generated
+**/.claude/hooks/**         linguist-generated
+**/.claude/rules/**         linguist-generated
+**/.claude/settings.json    linguist-generated
+**/.claude/skills/**        linguist-generated

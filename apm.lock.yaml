@@ -1,0 +1,113 @@
+lockfile_version: '1'
+dependencies: []
+deployments:
+- kind: project-relative
+  target: claude
+  value: .claude/skills/feather-cryptography
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: claude
+  value: .claude/skills/feather-cryptography/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:510e3675dfd23100e839fb0e83b2920c2d7fec67fbd7692ce489fda62a882515
+- kind: project-relative
+  target: claude
+  value: .claude/skills/feather-cryptography/references/anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:facb66ec684ed5dbc7a40ab3fb09c9f5ec3599a1b37c0120542e71e6d5ebac9b
+- kind: project-relative
+  target: claude
+  value: .claude/skills/feather-cryptography/references/examples.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:df0b1d0553b39e7e75e0ca90471f994b0750b77c0f3eb5c78c412a484d850a76
+- kind: project-relative
+  target: claude
+  value: .claude/skills/feather-cryptography/references/preferred-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:2e5f3df8a21acd9fe9bf34fd3daf40fdf312124f7274a8aee67b81171f1e4783
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/feather-cryptography
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: null
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/feather-cryptography/SKILL.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:510e3675dfd23100e839fb0e83b2920c2d7fec67fbd7692ce489fda62a882515
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/feather-cryptography/references/anti-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:facb66ec684ed5dbc7a40ab3fb09c9f5ec3599a1b37c0120542e71e6d5ebac9b
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/feather-cryptography/references/examples.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:df0b1d0553b39e7e75e0ca90471f994b0750b77c0f3eb5c78c412a484d850a76
+- kind: project-relative
+  target: legacy
+  value: .agents/skills/feather-cryptography/references/preferred-patterns.md
+  runtime: null
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:2e5f3df8a21acd9fe9bf34fd3daf40fdf312124f7274a8aee67b81171f1e4783
+local_deployed_files:
+- .agents/skills/feather-cryptography
+- .agents/skills/feather-cryptography/SKILL.md
+- .agents/skills/feather-cryptography/references/anti-patterns.md
+- .agents/skills/feather-cryptography/references/examples.md
+- .agents/skills/feather-cryptography/references/preferred-patterns.md
+- .claude/skills/feather-cryptography
+- .claude/skills/feather-cryptography/SKILL.md
+- .claude/skills/feather-cryptography/references/anti-patterns.md
+- .claude/skills/feather-cryptography/references/examples.md
+- .claude/skills/feather-cryptography/references/preferred-patterns.md
+local_deployed_file_hashes:
+  .agents/skills/feather-cryptography/SKILL.md: sha256:510e3675dfd23100e839fb0e83b2920c2d7fec67fbd7692ce489fda62a882515
+  .agents/skills/feather-cryptography/references/anti-patterns.md: sha256:facb66ec684ed5dbc7a40ab3fb09c9f5ec3599a1b37c0120542e71e6d5ebac9b
+  .agents/skills/feather-cryptography/references/examples.md: sha256:df0b1d0553b39e7e75e0ca90471f994b0750b77c0f3eb5c78c412a484d850a76
+  .agents/skills/feather-cryptography/references/preferred-patterns.md: sha256:2e5f3df8a21acd9fe9bf34fd3daf40fdf312124f7274a8aee67b81171f1e4783
+  .claude/skills/feather-cryptography/SKILL.md: sha256:510e3675dfd23100e839fb0e83b2920c2d7fec67fbd7692ce489fda62a882515
+  .claude/skills/feather-cryptography/references/anti-patterns.md: sha256:facb66ec684ed5dbc7a40ab3fb09c9f5ec3599a1b37c0120542e71e6d5ebac9b
+  .claude/skills/feather-cryptography/references/examples.md: sha256:df0b1d0553b39e7e75e0ca90471f994b0750b77c0f3eb5c78c412a484d850a76
+  .claude/skills/feather-cryptography/references/preferred-patterns.md: sha256:2e5f3df8a21acd9fe9bf34fd3daf40fdf312124f7274a8aee67b81171f1e4783
